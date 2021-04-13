@@ -52,6 +52,7 @@ namespace Acr.UserDialogs
             {
 #if __IOS__
                 Mode = UIDatePickerMode.Date,
+                PickerStyle = GetPickerStyle(config),
 #endif
                 SelectedDateTime = config.SelectedDate ?? DateTime.Now,
                 OkText = config.OkText,
@@ -75,6 +76,7 @@ namespace Acr.UserDialogs
             {
 #if __IOS__
                 Mode = UIDatePickerMode.Time,
+                PickerStyle = GetPickerStyle(config),
 #endif
                 SelectedDateTime = config.SelectedTime != null ? DateTime.Today.Add ((TimeSpan)config.SelectedTime) : DateTime.Now,
                 MinuteInterval = config.MinuteInterval,
@@ -135,6 +137,7 @@ namespace Acr.UserDialogs
                 this.SetInputType(txt, config.InputType);
                 txt.Placeholder = config.Placeholder ?? String.Empty;
                 txt.Text = config.Text ?? String.Empty;
+                txt.AutocorrectionType = (UITextAutocorrectionType)config.AutoCorrectionConfig;
 
                 if (config.MaxLength != null)
                 {
@@ -227,13 +230,13 @@ namespace Acr.UserDialogs
         {
             var sheet = UIAlertController.Create(config.Title, config.Message, UIAlertControllerStyle.ActionSheet);
 
-            if (config.Destructive != null)
-                this.AddActionSheetOption(config.Destructive, sheet, UIAlertActionStyle.Destructive, config.ItemIcon);
-
             config
                 .Options
                 .ToList()
                 .ForEach(x => this.AddActionSheetOption(x, sheet, UIAlertActionStyle.Default, config.ItemIcon));
+
+            if (config.Destructive != null)
+                this.AddActionSheetOption(config.Destructive, sheet, UIAlertActionStyle.Destructive, config.ItemIcon);
 
             if (config.Cancel != null)
                 this.AddActionSheetOption(config.Cancel, sheet, UIAlertActionStyle.Cancel, config.ItemIcon);
@@ -331,6 +334,18 @@ namespace Acr.UserDialogs
                     txt.KeyboardType = UIKeyboardType.Url;
                     break;
             }
+        }
+
+        protected iOSPickerStyle GetPickerStyle(IiOSStyleDialogConfig config)
+        {
+            //var iOSConfig = (config as IiOSStyleDialogConfig);
+            if (config == null)
+                return iOSPickerStyle.Auto;
+
+            if (!config.iOSPickerStyle.HasValue)
+                return iOSPickerStyle.Auto;
+
+            return config.iOSPickerStyle.Value;
         }
 
         #endregion

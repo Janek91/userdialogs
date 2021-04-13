@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using Android.App;
 using Android.Content;
@@ -38,6 +38,21 @@ namespace Acr.UserDialogs.Builders
 
             SetInputType(txt, config.InputType);
 
+            if (config.AutoCorrectionConfig != AutoCorrectionConfig.Default)
+            {
+                switch (config.AutoCorrectionConfig)
+                {
+                    case AutoCorrectionConfig.No:
+                        txt.InputType |= InputTypes.TextFlagNoSuggestions; // Add Flag
+                        break;
+                    case AutoCorrectionConfig.Yes:
+                        txt.InputType &= ~InputTypes.TextFlagNoSuggestions; // Remove Flag
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             var builder = new AlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
                 .SetCancelable(false)
                 .SetMessage(config.Message)
@@ -76,6 +91,21 @@ namespace Acr.UserDialogs.Builders
                 txt.SetFilters(new[] { new InputFilterLengthFilter(config.MaxLength.Value) });
 
             SetInputType(txt, config.InputType);
+
+            if (config.AutoCorrectionConfig != AutoCorrectionConfig.Default)
+            {
+                switch(config.AutoCorrectionConfig)
+                {
+                    case AutoCorrectionConfig.No:
+                        txt.InputType |= InputTypes.TextFlagNoSuggestions; // Add Flag
+                        break;
+                    case AutoCorrectionConfig.Yes:
+                        txt.InputType &= ~InputTypes.TextFlagNoSuggestions; // Remove Flag
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             var builder = new AppCompatAlertDialog.Builder(activity, config.AndroidStyleId ?? 0)
                 .SetCancelable(false)
@@ -187,12 +217,13 @@ namespace Acr.UserDialogs.Builders
 
                 case InputType.NumericPassword:
                     txt.TransformationMethod = PasswordTransformationMethod.Instance;
-                    txt.InputType = InputTypes.ClassNumber;
+                    txt.InputType = InputTypes.ClassNumber | InputTypes.TextFlagNoSuggestions;
                     break;
 
                 case InputType.Password:
                     txt.TransformationMethod = PasswordTransformationMethod.Instance;
-                    //txt.InputType = InputTypes.ClassText | InputTypes.TextVariationPassword;
+                    txt.InputType = InputTypes.TextFlagNoSuggestions;
+                    //txt.InputType = InputTypes.ClassText | InputTypes.TextVariationPassword | InputTypes.TextFlagNoSuggestions;
                     break;
 
                 case InputType.Phone:
